@@ -6,17 +6,32 @@ from views import LoginFrame, MainFrame
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.title("宿舍管理系統")
-        self.geometry("400x300")
-        self.show_login()
 
-    def show_login(self):
-        LoginFrame(self, on_login_success=self.show_main).pack(fill="both", expand=True)
+        # Window Setting
+        self.title("Dormitory Management System")
+        self.geometry("800x450")
 
-    def show_main(self, user):
-        for widget in self.winfo_children():
-            widget.destroy()
-        MainFrame(self, user=user).pack(fill="both", expand=True)
+        # Register all frames(menus)
+        self.frames = {}
+
+        def on_login_success(username, password):
+            self.goto("main", username=username)
+
+        self.frames["login"] = LoginFrame(self, on_login_success=on_login_success)
+
+        self.frames["main"] = MainFrame(self)
+
+        for frame in self.frames.values():
+            frame.place(relx=0, rely=0, relwidth=1, relheight=1)
+
+        # Initial frame
+        self.goto("login")
+
+    def goto(self, name, **kwargs):
+        frame = self.frames[name]
+        if hasattr(frame, "_resumed"):
+            frame._resumed(**kwargs)
+        frame.tkraise()
 
 
 app = App()
