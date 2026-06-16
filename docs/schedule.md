@@ -1,9 +1,9 @@
 1. Discover schema from requirement
-   → ER model 
-   → Relational model
-   → Create table instruction  (PK/FK/Other constraints）
+- ER model (done)
+- Relational model (done)
+- Create table instruction (PK/FK/Other constraints）
 
-2. Reflect schema with menus
+2. Reflect schema with menus(done)
    For each menu, find out:
    	1. What table should be shown and operated
    	2. Component structure 
