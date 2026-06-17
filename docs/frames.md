@@ -73,6 +73,9 @@ When RegisterButton pressed
 `room`
 2. Component structure 
 ```
+
+```
+```
 ManageRoomFrame (CTkFrame)
     SearchBar (CTkFrame)
         Hbox

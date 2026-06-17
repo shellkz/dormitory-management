@@ -13,7 +13,7 @@ class MainFrame(ctk.CTkFrame):
         ctk.CTkButton(
             self.admin_panel,
             text="Room Management",
-            command=lambda: self.master.goto("auth"),
+            command=lambda: self.master.goto("room"),
         ).pack(pady=5)
         ctk.CTkButton(
             self.admin_panel,
