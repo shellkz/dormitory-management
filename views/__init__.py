@@ -1,4 +1,4 @@
-from .login_frame import LoginFrame
+from .auth_frame import AuthFrame
 from .main_frame import MainFrame
 
-__all__ = ["LoginFrame", "MainFrame"]
+__all__ = ["AuthFrame", "MainFrame"]
