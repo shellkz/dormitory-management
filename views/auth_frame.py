@@ -3,14 +3,11 @@ from tkinter import messagebox
 import customtkinter as ctk
 
 from features.auth import login, register
-from state import AppState
 
 
 class AuthFrame(ctk.CTkFrame):
-    def __init__(self, parent, context: AppState, on_login_success, **kwargs):
+    def __init__(self, parent, **kwargs):
         super().__init__(parent, **kwargs)
-        self.context = context
-        self.on_login_success = on_login_success
 
         container = ctk.CTkFrame(self, fg_color="transparent")
         container.place(relx=0.5, rely=0.5, anchor="center")
@@ -66,7 +63,9 @@ class AuthFrame(ctk.CTkFrame):
         password = self.login_password.get()
         try:
             user = login(username, password)
-            self.on_login_success(user)
+            self.master.context.current_user = user
+            self.master.goto("main")
+
         except Exception as e:
             messagebox.showerror("錯誤", e)
 

@@ -1,7 +1,7 @@
 1. Discover schema from requirement
 - ER model (done)
 - Relational model (done)
-- Create table instruction (PK/FK/Other constraints）
+- Create table instruction (PK/FK/Other constraints）(done)
 
 2. Reflect schema with menus(done)
    For each menu, find out:
