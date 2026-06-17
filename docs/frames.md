@@ -31,13 +31,17 @@ Vbox
                 PasswordLabel
                 PasswordInput
             LoginButton
-       RegisterTabPanel
+
+        RegisterTabPanel
             Hbox
                 UsernameLabel
                 UsernameInput
             Hbox
                 PasswordLabel
                 PasswordInput
+            Hbox
+                ConfirmPasswordLabel
+                ConfirmPasswordInput
             RegisterButton
 
 ```
