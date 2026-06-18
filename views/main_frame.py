@@ -18,7 +18,7 @@ class MainFrame(ctk.CTkFrame):
         ctk.CTkButton(
             self.admin_panel,
             text="Assign Room",
-            command=lambda: self.master.goto("auth"),
+            command=lambda: self.master.goto("assign"),
         ).pack(pady=5)
         ctk.CTkButton(
             self.admin_panel,

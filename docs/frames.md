@@ -64,7 +64,6 @@ When RegisterButton pressed
 
 
 ## ManageRoom
-
 0. Functionality
 - admin: CRUD room
 - resident: search room
@@ -95,7 +94,6 @@ ManageRoomFrame (CTkFrame)
             FloorEntry
             CreateButton
 ```
-
 ```
 RoomItem
     Hbox
@@ -122,28 +120,37 @@ Let admin check-in/out resident into/from room
 1. What table should be shown and operated
 `stay`、`room`
 2. Component structure 
-```
-CheckInOutFrame (CTkFrame)
-    CTkScrollableFrame
-        AssignRoomItem (CTkFrame) × N
 
-AssignRoomItem (CTkFrame)
+
+```
+AssignFrame (CTkFrame)
+    CheckInOutForm:CTkFrame
+        Label("辦理入住")
+        UsernameEntry
+        RoomIdEntry
+        CheckInButton
+  
+    CheckInOutForm:CTkFrame
+        Label("辦理退房")
+        RoomIdEntry
+        CheckInButton
+
+    CTkScrollableFrame
+        AssignItem (CTkFrame) × N
+
+AssignItem (CTkFrame)
     Hbox
         IdLabel
         TypeLabel
         FloorLabel
+ 
+        ResidentLabel         ← 住客 username 還沒checkin就不顯示
+        CheckInAtLabel        ← check_in_at   還沒checkin就不顯示
+        CheckOutAtLabel         ← check_in_at 還沒checkout就不顯示
 
-        [空房模式]
-        ResidentOptionMenu    ← 列出無 active stay 的 resident
-        CheckInButton
 
-        [有人住模式]
-        ResidentLabel         ← 目前住客 username
-        CheckInAtLabel        ← check_in_at
-        CheckOutButton
+  
 ```
-
-
 
 
 

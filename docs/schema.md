@@ -6,7 +6,7 @@ A system for managing dorm rooms, resident check-ins/check-outs, and maintenance
 
 ## Required Basic Functions:
 1. Register / login with role (admin / resident)	[done]
-1. Add and manage room records and types
+1. Add and manage room records and types            [done]
 1. Assign rooms and record check-in / check-out
 1. Submit and track maintenance requests
 1. View current occupancy report

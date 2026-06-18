@@ -30,6 +30,19 @@ class Stay:
 
 
 @dataclass
+class StayRead:
+    resident_id: int
+    username: str
+
+    room_id: int
+    type: str
+    floor: int
+
+    check_in_at: str
+    check_out_at: Optional[str]
+
+
+@dataclass
 class RequestMaintenance:
     id: int
     created_by: int
