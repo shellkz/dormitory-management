@@ -1,0 +1,1 @@
+1. RoomFrame item in listview sometimes collapse and clump together. 

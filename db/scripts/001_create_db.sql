@@ -22,7 +22,7 @@ CREATE TABLE Stay (
     check_out_at    TEXT,
     
     FOREIGN KEY (resident_id)   REFERENCES User(id),
-    FOREIGN KEY (room_id)       REFERENCES Room(id)
+    FOREIGN KEY (room_id)       REFERENCES Room(id)  ON DELETE CASCADE
 );
 
 CREATE TABLE RequestMaintenance (
@@ -36,6 +36,6 @@ CREATE TABLE RequestMaintenance (
     completed_at    TEXT,
 
     FOREIGN KEY (created_by)    REFERENCES User(id),
-    FOREIGN KEY (room_id)       REFERENCES Room(id)
+    FOREIGN KEY (room_id)       REFERENCES Room(id)  ON DELETE CASCADE
 );
 

@@ -1,4 +1,12 @@
-from .db import create_user, get_connection, get_user
+from .db import (
+    create_room,
+    create_user,
+    delete_room,
+    get_connection,
+    get_rooms,
+    get_user,
+    update_room,
+)
 from .models import RequestMaintenance, Room, Stay, User
 
 __all__ = [
