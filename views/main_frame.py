@@ -23,7 +23,7 @@ class MainFrame(ctk.CTkFrame):
         ctk.CTkButton(
             self.admin_panel,
             text="Maintenance",
-            command=lambda: self.master.goto("auth"),
+            command=lambda: self.master.goto("maintenance"),
         ).pack(pady=5)
         ctk.CTkButton(
             self.admin_panel,
@@ -36,12 +36,12 @@ class MainFrame(ctk.CTkFrame):
         ctk.CTkButton(
             self.resident_panel,
             text="Room Search",
-            command=lambda: self.master.goto("auth"),
+            command=lambda: self.master.goto("room"),
         ).pack(pady=5)
         ctk.CTkButton(
             self.resident_panel,
             text="Maintenance",
-            command=lambda: self.master.goto("auth"),
+            command=lambda: self.master.goto("maintenance"),
         ).pack(pady=5)
 
     def _resumed(self):
