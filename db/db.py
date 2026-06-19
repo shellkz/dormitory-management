@@ -472,8 +472,8 @@ def get_maintenance_requests(
             conditions.append("RequestMaintenance.status = ?")
             params.append(status)
         if username is not None:
-            conditions.append("User.username = ?")
-            params.append(username)
+            conditions.append("User.username LIKE ?")
+            params.append(f"%{username}%")
         if room_id is not None:
             conditions.append("RequestMaintenance.room_id = ?")
             params.append(room_id)

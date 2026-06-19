@@ -1,9 +1,12 @@
 import db
 from db import User
-from features.auth import is_username_valid
 from features.room import is_id_valid
 
 VALID_STATUS = {"submitted", "processing", "completed"}
+
+
+def is_keyword_valid(keyword: str) -> bool:
+    return bool(keyword)
 
 
 def is_status_valid(status: str) -> bool:
@@ -74,7 +77,7 @@ def get_requests(
         raise ValueError(f"[Maintenance] Invalid id. Value = {id}")
     if not is_status_valid(status):
         raise ValueError(f"[Maintenance] Invalid status. Value = {status}")
-    if username is not None and not is_username_valid(username):
+    if username is not None and not is_keyword_valid(username):
         raise ValueError(f"[Maintenance] Invalid username. Value = {username}")
     if room_id is not None and not is_id_valid(room_id):
         raise ValueError(f"[Maintenance] Invalid room_id. Value = {room_id}")
