@@ -63,8 +63,8 @@ class AuthFrame(ctk.CTkFrame):
         password = self.login_password.get()
         try:
             user = login(username, password)
-            self.master.context.current_user = user
-            self.master.goto("main")
+            self.winfo_toplevel().context.current_user = user
+            self.winfo_toplevel().goto("room")
 
         except Exception as e:
             messagebox.showerror("錯誤", e)

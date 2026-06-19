@@ -22,7 +22,7 @@
 
 ## 必做缺漏
 ### Navigation
-1. APP is composed of SideNavigation(old main_frame) and RightContentPanel(other frames)
+1. APP is composed of SideNavigation(old main_frame) and RightContentPanel(other frames) [done]
 
 ### A. SQL VIEW（Database Design 25分）
 要求 at least one `CREATE VIEW` used in the app，目前完全沒有。
