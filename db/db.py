@@ -301,7 +301,7 @@ def get_stays(
         sql += "JOIN Room ON Stay.room_id = Room.id "
         sql += "JOIN User ON Stay.resident_id = User.id "
         if conditions:
-            sql += "WHERE " + " AND ".join(conditions)
+            sql += "WHERE " + " AND ".join(conditions) + " "
         sql += "ORDER BY Stay.id DESC "
         cursor.execute(sql, params)
 
@@ -484,7 +484,7 @@ def get_maintenance_requests(
         sql += "JOIN Room ON RequestMaintenance.room_id = Room.id "
         sql += "JOIN User ON RequestMaintenance.created_by = User.id "
         if conditions:
-            sql += "WHERE " + " AND ".join(conditions)
+            sql += "WHERE " + " AND ".join(conditions) + " "
         sql += "ORDER BY RequestMaintenance.id DESC "
         cursor.execute(sql, params)
 

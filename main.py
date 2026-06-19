@@ -1,7 +1,14 @@
 import customtkinter as ctk
 
 from state import AppState
-from views import AssignFrame, AuthFrame, MainFrame, MaintenanceFrame, RoomFrame
+from views import (
+    AssignFrame,
+    AuthFrame,
+    MainFrame,
+    MaintenanceFrame,
+    ReportFrame,
+    RoomFrame,
+)
 
 
 class App(ctk.CTk):
@@ -21,6 +28,8 @@ class App(ctk.CTk):
         self.frames["room"] = RoomFrame(self)
         self.frames["assign"] = AssignFrame(self)
         self.frames["maintenance"] = MaintenanceFrame(self)
+        self.frames["report"] = ReportFrame(self)
+
         for frame in self.frames.values():
             frame.place(relx=0, rely=0, relwidth=1, relheight=1)
 

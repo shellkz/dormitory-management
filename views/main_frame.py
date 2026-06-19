@@ -28,7 +28,7 @@ class MainFrame(ctk.CTkFrame):
         ctk.CTkButton(
             self.admin_panel,
             text="Report",
-            command=lambda: self.master.goto("auth"),
+            command=lambda: self.master.goto("report"),
         ).pack(pady=5)
 
         # Resident panel

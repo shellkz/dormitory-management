@@ -214,6 +214,7 @@ MaintenanceRequestItem
 
 ## ReportFrame
 0. Function
+View current occupancy report
 - admin: View current occupancy report
 - resident: cannot access
 
@@ -224,11 +225,17 @@ MaintenanceRequestItem
 ```
 ReportFrame (CTkFrame)
     Vbox
-        TotalRoomsLabel         ← 總房間數：xx 間
+        TotalRoomsLabel         ← 總房間數：xx 間  
         OccupiedLabel           ← 已入住：xx 間
         AvailableLabel          ← 空房：xx 間
         OccupancyRateBar:CTkProgressBar          ← 入住比例圖
         OccupancyRateLabel      ← xx%
 
+
+```
+```
+get_rooms()                     total
+get_stays(active_only=True)     occupied
+total - occupied                available
 
 ```
