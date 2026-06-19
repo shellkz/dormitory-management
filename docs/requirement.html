@@ -1,0 +1,704 @@
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Term Project Specification — Database Management Systems</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&amp;family=DM+Mono:wght@400;500&amp;family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&amp;display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a2e;
+    --ink-light: #4a4a6a;
+    --ink-faint: #8888aa;
+    --paper: #faf9f6;
+    --paper-warm: #f3f0e8;
+    --rule: #dddbd3;
+    --accent: #c84b2f;
+    --accent-dark: #9e3520;
+    --accent-light: #f5e8e5;
+    --gold: #b5850a;
+    --gold-light: #fdf4e0;
+    --green: #2a6e4a;
+    --green-light: #e6f4ec;
+    --blue: #1e4d8c;
+    --blue-light: #e8eef8;
+    --table-header: #3a4a6b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 17px;
+    line-height: 1.75;
+  }
+
+  .zh {
+    font-family: 'Microsoft JhengHei', '微軟正黑體', 'PingFang TC', sans-serif;
+  }
+
+  /* ── PAGE WRAPPER ── */
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 52px 44px 88px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    border-top: 4px solid var(--ink);
+    border-bottom: 1px solid var(--rule);
+    padding: 30px 0 22px;
+    margin-bottom: 38px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    align-items: end;
+  }
+  .header-school {
+    font-family: 'DM Mono', monospace;
+    font-size: 11.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 7px;
+  }
+  .header-course {
+    font-family: 'DM Serif Display', serif;
+    font-size: 33px;
+    line-height: 1.15;
+    color: var(--ink);
+  }
+  .header-sub {
+    font-size: 15px;
+    color: var(--ink-light);
+    margin-top: 7px;
+  }
+  .header-meta {
+    text-align: right;
+    font-family: 'DM Mono', monospace;
+    font-size: 12.5px;
+    color: var(--ink-faint);
+    line-height: 2;
+  }
+  .header-meta strong {
+    color: var(--ink-light);
+    font-weight: 500;
+  }
+
+  /* ── SECTION TITLE ── */
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 11px;
+    padding-bottom: 7px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 24px;
+    color: var(--ink);
+    margin-bottom: 18px;
+  }
+
+  /* ── AI WARNING ── */
+  .warning-block {
+    background: #fff8f7;
+    border: 1.5px solid var(--accent);
+    border-left: 5px solid var(--accent);
+    border-radius: 4px;
+    padding: 22px 26px;
+    margin-bottom: 42px;
+  }
+  .warning-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent-dark);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .warning-block p {
+    font-size: 15.5px;
+    color: #5c2a20;
+    margin-bottom: 9px;
+    line-height: 1.85;
+  }
+  .warning-block p:last-child { margin-bottom: 0; }
+  .warning-block ul {
+    margin: 9px 0 9px 22px;
+    font-size: 15.5px;
+    color: #5c2a20;
+    line-height: 1.85;
+  }
+  .warning-block ul li { margin-bottom: 5px; }
+  .warning-block strong { color: var(--accent-dark); }
+
+  /* ── SCENARIO CARDS — ROW LAYOUT ── */
+  .cards {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 46px;
+  }
+  .card {
+    border: 1.5px solid var(--rule);
+    border-radius: 6px;
+    background: #fff;
+    display: grid;
+    grid-template-columns: 260px 1fr 200px;
+    gap: 0;
+    transition: box-shadow 0.2s;
+    overflow: hidden;
+  }
+  .card:hover { box-shadow: 0 4px 18px rgba(0,0,0,0.07); }
+
+  /* Left column: icon + title + desc */
+  .card-left {
+    padding: 22px 22px 22px 24px;
+    border-right: 1px solid var(--rule);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  .card-icon {
+    font-size: 26px;
+    margin-bottom: 9px;
+    display: block;
+  }
+  .card-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--ink);
+    margin-bottom: 7px;
+    line-height: 1.2;
+  }
+  .card-desc {
+    font-size: 13px;
+    color: var(--ink-light);
+    line-height: 1.6;
+  }
+
+  /* Middle column: required functions */
+  .card-middle {
+    padding: 22px 20px;
+    border-right: 1px solid var(--rule);
+  }
+  .card-funcs-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 7px;
+  }
+  .card-funcs {
+    list-style: none;
+    padding: 0;
+  }
+  .card-funcs li {
+    font-size: 13px;
+    color: var(--ink-light);
+    padding: 4px 0 4px 15px;
+    position: relative;
+    line-height: 1.5;
+    border-bottom: 1px dotted var(--rule);
+  }
+  .card-funcs li:last-child { border-bottom: none; }
+  .card-funcs li::before {
+    content: '›';
+    position: absolute;
+    left: 2px;
+    color: var(--ink-faint);
+    font-size: 15px;
+    line-height: 1.3;
+  }
+
+  /* Right column: suggested tables */
+  .card-right {
+    padding: 22px 20px;
+    background: var(--paper);
+  }
+  .card-tables-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 8px;
+  }
+  .card-tables {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .table-pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    background: #fff;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 3px 9px;
+    color: var(--ink-light);
+  }
+
+  /* ── REQUIREMENTS ── */
+  .req-section { margin-bottom: 46px; }
+  .req-group { margin-bottom: 24px; }
+
+  .req-group-title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 3px;
+    margin-bottom: 11px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .req-group-title.db  { background: var(--blue-light);   color: var(--blue); }
+  .req-group-title.app { background: var(--green-light);  color: var(--green); }
+  .req-group-title.sec { background: var(--accent-light); color: var(--accent-dark); }
+  .req-group-title.sub { background: var(--gold-light);   color: var(--gold); }
+
+  .req-list { list-style: none; padding: 0; }
+  .req-list li {
+    font-size: 15.5px;
+    color: var(--ink);
+    padding: 8px 0 8px 24px;
+    border-bottom: 1px solid var(--rule);
+    position: relative;
+    line-height: 1.6;
+  }
+  .req-list li:last-child { border-bottom: none; }
+  .req-list li::before {
+    content: '▸';
+    position: absolute;
+    left: 5px;
+    color: var(--ink-faint);
+    font-size: 11px;
+    top: 11px;
+  }
+  .req-list code {
+    font-family: 'DM Mono', monospace;
+    font-size: 13.5px;
+    background: var(--paper-warm);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 1px 5px;
+    color: var(--ink);
+  }
+
+  /* ── SCORING TABLE ── */
+  .rubric-section { margin-bottom: 46px; }
+
+  .rubric-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+  }
+  .rubric-table thead tr {
+    background: var(--table-header);
+    color: white;
+  }
+  .rubric-table thead th {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 500;
+    padding: 11px 16px;
+    text-align: left;
+  }
+  .rubric-table thead th:last-child { text-align: right; }
+  .rubric-table tbody tr { border-bottom: 1px solid var(--rule); }
+  .rubric-table tbody tr:last-child { border-bottom: 2px solid var(--table-header); }
+  .rubric-table tbody tr.total-row {
+    background: var(--paper-warm);
+    font-weight: 600;
+  }
+  .rubric-table tbody td {
+    padding: 10px 16px;
+    vertical-align: top;
+  }
+  .rubric-table tbody td:last-child {
+    text-align: right;
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .rubric-table tbody td.cat {
+    font-weight: 500;
+    color: var(--ink);
+    white-space: nowrap;
+    font-size: 14.5px;
+  }
+  .rubric-table tbody td.items {
+    color: var(--ink-light);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+  .rubric-table tbody td.items code {
+    font-family: 'DM Mono', monospace;
+    font-size: 12.5px;
+    background: var(--paper-warm);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 1px 4px;
+    color: var(--ink);
+  }
+  .pts-badge {
+    background: var(--table-header);
+    color: white;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    border-radius: 3px;
+    padding: 2px 8px;
+  }
+  .rubric-table tbody tr.total-row td {
+    font-family: 'DM Serif Display', serif;
+    font-size: 17px;
+  }
+
+  /* ── SUBMISSION ── */
+  .submit-section { margin-bottom: 20px; }
+  .submit-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 13px;
+  }
+  .submit-item {
+    border: 1.5px solid var(--rule);
+    border-radius: 5px;
+    padding: 16px 18px;
+    background: #fff;
+    display: flex;
+    gap: 13px;
+    align-items: flex-start;
+  }
+  .submit-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    background: var(--table-header);
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .submit-item-title {
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .submit-item-desc {
+    font-size: 13.5px;
+    color: var(--ink-light);
+    line-height: 1.55;
+  }
+  .submit-item-desc code {
+    font-family: 'DM Mono', monospace;
+    font-size: 12.5px;
+    background: var(--paper-warm);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 0px 5px;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 58px;
+    padding-top: 18px;
+    border-top: 1px solid var(--rule);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+    text-align: center;
+    letter-spacing: 0.06em;
+  }
+
+  @media print {
+    body { background: white; font-size: 14px; }
+    .page { padding: 20px 24px 40px; max-width: 100%; }
+    .card:hover { box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div>
+      <div class="header-school">National United University &nbsp;·&nbsp; Dept. of CSIE</div>
+      <div class="header-course">Term Project Specification<br><em style="font-size:24px;color:var(--ink-light)">Database Management Systems</em></div>
+      <div class="header-sub">Individual project · Choose one scenario · See requirements and scoring below</div>
+    </div>
+    <div class="header-meta">
+      <div><strong>Instructor</strong> Yu-Wei Wen</div>
+      <div><strong>Semester</strong> 114-2</div>
+      <div><strong>Total</strong> 100 pts</div>
+    </div>
+  </header>
+
+  <!-- AI WARNING — Traditional Chinese, 微軟正黑體 -->
+  <div class="warning-block zh">
+    <div class="warning-title">⚠️ 學術誠信聲明 — 生成式 AI 使用規範</div>
+    <p>本課程<strong>允許</strong>使用生成式 AI 工具（如 ChatGPT、Claude、GitHub Copilot 等），但須於期末報告中附上完整的 <strong>AI 使用聲明</strong>，並明確說明下列事項：</p>
+    <ul>
+      <li>所使用之 AI 工具名稱（請逐一列出）</li>
+      <li>每項工具的<em>具體用途</em>（例如：「使用 Claude 產生初版 ER 圖，並自行修改後定稿」）</li>
+      <li>說明哪些部分由學生本人獨立理解與實作完成</li>
+    </ul>
+    <p><strong>若繳交之作品明顯由 AI 全程生成，且缺乏個人理解與實作之跡象，該作業將以零分計算。</strong>如於展示過程中無法自行解釋程式碼或資料庫設計決策，無論是否已提交聲明，均視同違反學術誠信。</p>
+    <p>未聲明擅自使用 AI 工具，屬違反本校學術誠信規範之行為，情節嚴重者將依校規處理。</p>
+  </div>
+
+  <!-- SCENARIOS — ROW LAYOUT -->
+  <div class="section-label">Step 1 — Choose Your Scenario</div>
+  <h2>Pick One Topic</h2>
+  <div class="cards">
+
+    <!-- Card 1 -->
+    <div class="card">
+      <div class="card-left">
+        <span class="card-icon">💰</span>
+        <div class="card-title">Personal Finance Tracker</div>
+        <div class="card-desc">A system for managing personal income, expenses, and budgets across multiple categories and accounts.</div>
+      </div>
+      <div class="card-middle">
+        <div class="card-funcs-label">Required Basic Functions</div>
+        <ul class="card-funcs">
+          <li>Register / login with role (admin / member)</li>
+          <li>Add, edit, delete income &amp; expense records</li>
+          <li>Manage and assign spending categories</li>
+          <li>Set and track monthly budgets per category</li>
+          <li>View account balance summary report</li>
+          <li>Search transactions by date range or keyword</li>
+        </ul>
+      </div>
+      <div class="card-right">
+        <div class="card-tables-label">Suggested Tables</div>
+        <div class="card-tables">
+          <span class="table-pill">users</span>
+          <span class="table-pill">accounts</span>
+          <span class="table-pill">transactions</span>
+          <span class="table-pill">categories</span>
+          <span class="table-pill">budgets</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="card">
+      <div class="card-left">
+        <span class="card-icon">📦</span>
+        <div class="card-title">Inventory Management</div>
+        <div class="card-desc">A small-shop system tracking products, suppliers, stock levels, and purchase/sale transactions.</div>
+      </div>
+      <div class="card-middle">
+        <div class="card-funcs-label">Required Basic Functions</div>
+        <ul class="card-funcs">
+          <li>Register / login with role (manager / staff)</li>
+          <li>Add, edit, delete products and categories</li>
+          <li>Record stock-in and stock-out transactions</li>
+          <li>Link products to one or more suppliers</li>
+          <li>View low-stock alert report</li>
+          <li>Search products by name or category</li>
+        </ul>
+      </div>
+      <div class="card-right">
+        <div class="card-tables-label">Suggested Tables</div>
+        <div class="card-tables">
+          <span class="table-pill">users</span>
+          <span class="table-pill">products</span>
+          <span class="table-pill">suppliers</span>
+          <span class="table-pill">orders</span>
+          <span class="table-pill">product_supplier</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="card">
+      <div class="card-left">
+        <span class="card-icon">🏠</span>
+        <div class="card-title">Dormitory Room Allocation</div>
+        <div class="card-desc">A system for managing dorm rooms, resident check-ins/check-outs, and maintenance requests.</div>
+      </div>
+      <div class="card-middle">
+        <div class="card-funcs-label">Required Basic Functions</div>
+        <ul class="card-funcs">
+          <li>Register / login with role (admin / resident)</li>
+          <li>Add and manage room records and types</li>
+          <li>Assign rooms and record check-in / check-out</li>
+          <li>Submit and track maintenance requests</li>
+          <li>View current occupancy report</li>
+          <li>Search rooms by status, type, or floor</li>
+        </ul>
+      </div>
+      <div class="card-right">
+        <div class="card-tables-label">Suggested Tables</div>
+        <div class="card-tables">
+          <span class="table-pill">users</span>
+          <span class="table-pill">rooms</span>
+          <span class="table-pill">residents</span>
+          <span class="table-pill">allocations</span>
+          <span class="table-pill">maintenance</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- REQUIREMENTS -->
+  <div class="req-section">
+    <div class="section-label">Step 2 — Requirements</div>
+    <h2>What Your Project Must Do</h2>
+
+    <div class="req-group">
+      <div class="req-group-title db">🗄️ Database Design</div>
+      <ul class="req-list">
+        <li>Must have <strong>at least 3 related tables</strong> connected with proper foreign keys</li>
+        <li>Must include <strong>at least one many-to-many relationship</strong> implemented via a junction/bridge table</li>
+        <li>Must use <code>NOT NULL</code> or <code>UNIQUE</code> constraints where logically appropriate (e.g., usernames, emails)</li>
+        <li>Must create <strong>at least one SQL VIEW</strong> (virtual table) used for data retrieval in the application</li>
+        <li>Must draw an ER diagram <strong><u>by hand</u></strong> showing all entities, attributes, and relationships with correct notation. <em>Students are solely responsible for the image quality and readability — illegible diagrams will not be graded.</em></li>
+      </ul>
+    </div>
+
+    <div class="req-group">
+      <div class="req-group-title app">🖥️ Application Features</div>
+      <ul class="req-list">
+        <li>Must implement a <strong>working UI</strong> — text-based (console menu), GUI (e.g., Tkinter), or web UI</li>
+        <li>Must implement a <strong>login function</strong> that authenticates users before granting access</li>
+        <li>Must implement <strong>role-based access control</strong> with at least 2 distinct roles (e.g., admin vs. regular user) with different menu options and permissions</li>
+        <li>Must implement <strong>at least one search or filter feature</strong> using <code>LIKE</code> or comparison operators (<code>&lt;</code>, <code>&gt;</code>, <code>BETWEEN</code>, etc.)</li>
+        <li>Must implement <strong>at least one report view</strong> that retrieves data using a <code>JOIN</code> across 2 or more tables</li>
+        <li>Must <strong>gracefully handle invalid input</strong> — the program must not crash on bad data; show a clear error message instead</li>
+      </ul>
+    </div>
+
+    <div class="req-group">
+      <div class="req-group-title sec">🔐 Security</div>
+      <ul class="req-list">
+        <li>Passwords must be <strong>hashed</strong> before storage — never stored as plain text (e.g., use <code>hashlib</code> or <code>bcrypt</code>)</li>
+        <li>Must use <strong>parameterized queries</strong> (with <code>?</code> placeholders) for all user-supplied input — no f-string or string concatenation for SQL with user data</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SCORING -->
+  <div class="rubric-section">
+    <div class="section-label">Step 3 — Scoring</div>
+    <h2>Scoring (100 Points)</h2>
+    <table class="rubric-table">
+      <thead>
+        <tr>
+          <th style="width:22%">Category</th>
+          <th>Graded Items</th>
+          <th style="width:10%">Points</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="cat">🗄️ Database Design</td>
+          <td class="items">3+ tables with correct foreign keys; at least one many-to-many (junction table); appropriate <code>NOT NULL</code> / <code>UNIQUE</code> constraints; at least one <code>CREATE VIEW</code> used in the app</td>
+          <td><span class="pts-badge">25</span></td>
+        </tr>
+        <tr>
+          <td class="cat">🖥️ Application &amp; Features</td>
+          <td class="items">Working UI; login flow; role-based menus (2+ roles); search/filter with <code>LIKE</code> or operators; JOIN-based report; input error handling without crashes</td>
+          <td><span class="pts-badge">25</span></td>
+        </tr>
+        <tr>
+          <td class="cat">🔐 Security</td>
+          <td class="items">Hashed passwords (no plain text); all user input goes through parameterized queries; role permissions enforced at runtime</td>
+          <td><span class="pts-badge">20</span></td>
+        </tr>
+        <tr>
+          <td class="cat">📐 ER Diagram</td>
+          <td class="items">Hand-drawn; correct entities, attributes, and relationships; proper notation (PK underlined, cardinality marked); matches actual schema; image must be clear and legible</td>
+          <td><span class="pts-badge">10</span></td>
+        </tr>
+        <tr>
+          <td class="cat">📄 Write-up</td>
+          <td class="items">3–4 pages; explains schema design decisions and trade-offs; includes <span class="zh">AI 使用聲明</span> with specific tool names and usage descriptions</td>
+          <td><span class="pts-badge">10</span></td>
+        </tr>
+        <tr>
+          <td class="cat">🎬 Demo Video</td>
+          <td class="items">Under 3 minutes; shows login for each role; demonstrates core features (search, report, CRUD); narration or on-screen text explains what is happening</td>
+          <td><span class="pts-badge">10</span></td>
+        </tr>
+        <tr class="total-row">
+          <td colspan="2" style="font-family:'DM Serif Display',serif;font-size:17px;">Total</td>
+          <td><span class="pts-badge">100</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- WHAT TO HAND IN -->
+  <div class="submit-section">
+    <div class="section-label">Step 4 — Submission Checklist</div>
+    <h2>What to Hand In</h2>
+    <div class="submit-grid">
+
+      <div class="submit-item">
+        <div class="submit-num">1</div>
+        <div>
+          <div class="submit-item-title">Source Code</div>
+          <div class="submit-item-desc">All <code>.py</code> files and the <code>.db</code> file. Include a <code>README.md</code> or <code>README.txt</code> with instructions on how to run the program.</div>
+        </div>
+      </div>
+
+      <div class="submit-item">
+        <div class="submit-num">2</div>
+        <div>
+          <div class="submit-item-title">ER Diagram</div>
+          <div class="submit-item-desc">A photo or scan of your <strong><u>hand-drawn</u></strong> ER diagram. You are responsible for image clarity — blurry or illegible submissions will not be graded. Submit as <code>.jpg</code> or <code>.pdf</code>.</div>
+        </div>
+      </div>
+
+      <div class="submit-item">
+        <div class="submit-num">3</div>
+        <div>
+          <div class="submit-item-title">Write-up</div>
+          <div class="submit-item-desc">3–4 pages as <code>.pdf</code>. Must include schema design rationale <strong>and</strong> an <span class="zh">AI 使用聲明</span> section.</div>
+        </div>
+      </div>
+
+      <div class="submit-item">
+        <div class="submit-num">4</div>
+        <div>
+          <div class="submit-item-title">Demo Video</div>
+          <div class="submit-item-desc">Under 3 minutes. Upload to YouTube (unlisted) or submit as <code>.mp4</code>. Must show both roles in action.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    Database Management Systems &nbsp;·&nbsp; Semester 114-2 &nbsp;·&nbsp; National United University &nbsp;·&nbsp; Dept. of CSIE &nbsp;·&nbsp; Instructor: Yu-Wei Wen
+  </div>
+
+</div>
+
+
+</body></html>
