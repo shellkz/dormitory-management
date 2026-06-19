@@ -3,8 +3,15 @@ from typing import Callable
 
 import customtkinter as ctk
 
-from db import Room
-from features.room import create_room, delete_room, get_rooms, update_room
+from db import RoomRead
+from features.room import (
+    VALID_STATUS,
+    VALID_TYPE,
+    create_room,
+    delete_room,
+    get_rooms,
+    update_room,
+)
 
 
 class RoomFrame(ctk.CTkFrame):
@@ -20,12 +27,12 @@ class RoomFrame(ctk.CTkFrame):
         search_row.pack()
 
         self.search_status_option = ctk.CTkOptionMenu(
-            search_row, values=["all", "available", "occupied", "maintaining"]
+            search_row, values=["all"] + sorted(VALID_STATUS)
         )
         self.search_status_option.pack(side="left", padx=5)
 
         self.search_type_option = ctk.CTkOptionMenu(
-            search_row, values=["all", "small", "medium", "large"]
+            search_row, values=["all"] + sorted(VALID_TYPE)
         )
         self.search_type_option.pack(side="left", padx=5)
         self.search_floor_input = ctk.CTkEntry(search_row, placeholder_text="Floor")
@@ -54,9 +61,7 @@ class RoomFrame(ctk.CTkFrame):
         form_row = ctk.CTkFrame(self.create_form)
         form_row.pack()
 
-        self.create_type_option = ctk.CTkOptionMenu(
-            form_row, values=["small", "medium", "large"]
-        )
+        self.create_type_option = ctk.CTkOptionMenu(form_row, values=sorted(VALID_TYPE))
         self.create_type_option.pack(side="left", padx=5)
         self.create_floor_input = ctk.CTkEntry(form_row, placeholder_text="Floor")
         self.create_floor_input.pack(side="left", padx=5)
@@ -66,6 +71,9 @@ class RoomFrame(ctk.CTkFrame):
 
     def on_search(self):
         try:
+            _status = self.search_status_option.get()
+            _status = None if _status == "all" else _status
+
             _type = self.search_type_option.get()
             _type = None if _type == "all" else _type
 
@@ -80,7 +88,7 @@ class RoomFrame(ctk.CTkFrame):
             return
 
         try:
-            self.show_rooms(get_rooms(None, _type, _floor))
+            self.show_rooms(get_rooms(_status, _type, _floor))
         except Exception as e:
             messagebox.showerror("Error", e)
 
@@ -157,14 +165,13 @@ class RoomFrame(ctk.CTkFrame):
 
         self.show_rooms(get_rooms())
 
-    def show_rooms(self, rooms: list[Room]):
+    def show_rooms(self, rooms: list[RoomRead]):
         for widget in self.room_list.winfo_children():
             widget.destroy()
         for room in rooms:
             RoomItem(
                 self.room_list,
                 room,
-                "available",
                 is_admin=self.is_admin,
                 on_delete=self.on_delete,
                 on_update=self.on_update,
@@ -176,8 +183,7 @@ class RoomItem(ctk.CTkFrame):
     def __init__(
         self,
         parent,
-        room: Room,
-        status: str,
+        room: RoomRead,
         is_admin: bool = False,
         on_delete: Callable[[int], None] | None = None,
         on_update: Callable[[int, str, int], None] | None = None,
@@ -197,7 +203,7 @@ class RoomItem(ctk.CTkFrame):
         ctk.CTkLabel(self.view_frame, text=str(room.id), width=60).pack(side="left")
         ctk.CTkLabel(self.view_frame, text=room.type, width=100).pack(side="left")
         ctk.CTkLabel(self.view_frame, text=str(room.floor), width=60).pack(side="left")
-        ctk.CTkLabel(self.view_frame, text=status, width=100).pack(side="left")
+        ctk.CTkLabel(self.view_frame, text=room.status, width=100).pack(side="left")
 
         if is_admin:
             ctk.CTkButton(

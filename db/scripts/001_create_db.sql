@@ -39,3 +39,25 @@ CREATE TABLE RequestMaintenance (
     FOREIGN KEY (room_id)       REFERENCES Room(id)  ON DELETE CASCADE
 );
 
+CREATE VIEW RoomDetailed AS
+SELECT      Room.id     AS  id, 
+            Room.type   AS  type,
+            Room.floor  AS  floor,
+            CASE
+                WHEN Stay.id IS NULL 
+                THEN 'available' 
+                
+                WHEN Stay.check_out_at  IS NULL 
+                THEN 'occupied'
+                ELSE 'available'
+            END         AS  status
+FROM        Room
+LEFT JOIN   Stay    ON  Stay.room_id = Room.id
+                    AND Stay.id = (
+                        SELECT      id 
+                        FROM        Stay s 
+                        WHERE       s.room_id = Room.id
+                        ORDER BY    s.id DESC
+                        LIMIT       1
+                    );
+              

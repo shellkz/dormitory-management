@@ -3,7 +3,7 @@ import sqlite3
 from datetime import datetime
 from typing import Optional
 
-from .models import RequestMaintenanceRead, Room, Stay, StayRead, User
+from .models import RequestMaintenanceRead, RoomRead, Stay, StayRead, User
 
 DATEBASE_NAME = "dorm.db"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -86,9 +86,10 @@ def get_rooms(
     type: str | None = None,
     floor: int | None = None,
     id: int | None = None,
-) -> list[Room]:
+) -> list[RoomRead]:
+    #
     conn = None
-    result: list[Room] = []
+    result: list[RoomRead] = []
     try:
         conn = get_connection()
         cursor = conn.cursor()
@@ -96,9 +97,9 @@ def get_rooms(
         conditions = []
         params = []
 
-        # if status is not None:
-        #     conditions.append("status = ?")
-        #     params.append(status)
+        if status is not None:
+            conditions.append("status = ?")
+            params.append(status)
         if type is not None:
             conditions.append("type = ?")
             params.append(type)
@@ -109,12 +110,12 @@ def get_rooms(
             conditions.append("id = ?")
             params.append(id)
 
-        sql = "SELECT * FROM Room "
+        sql = "SELECT * FROM RoomDetailed "
         if conditions:
             sql += "WHERE " + " AND ".join(conditions)
         cursor.execute(sql, params)
         for room in cursor.fetchall():
-            result.append(Room(**room))
+            result.append(RoomRead(**room))
     finally:
         if conn:
             conn.close()
@@ -498,6 +499,6 @@ def get_maintenance_requests(
 
 
 # if __name__ == "__main__":
-#   run_sql("001_create_db.sql")
-#   run_sql("002_add_test_user.sql")
-#   run_sql("003_add_test_room.sql")
+#     run_sql("001_create_db.sql")
+#     run_sql("002_add_test_user.sql")
+#     run_sql("003_add_test_room.sql")

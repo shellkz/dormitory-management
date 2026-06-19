@@ -24,18 +24,18 @@
 ### Navigation
 1. APP is composed of SideNavigation(old main_frame) and RightContentPanel(other frames) [done]
 
-### A. SQL VIEW（Database Design 25分）
+### A. SQL VIEW（Database Design 25分）[done]
 要求 at least one `CREATE VIEW` used in the app，目前完全沒有。
 - 建議：`RoomStatusView`（JOIN Room + Stay 推導 occupied/available）
 - 或把 `get_maintenance_requests` 的 JOIN 改成 VIEW
-1. Room search filter(all/occupied/available/maintaining)
+1. Room search filter(all/occupied/available)
 
 
 ### B. LIKE 搜尋（Application Features 25分）
 要求 at least one search using `LIKE` or comparison operators，目前全部是 `= ?` 完全匹配。
 - 建議：maintenance viewer 的 username 搜尋改成 `LIKE ?`（加 % 模糊搜）
 
-### C. Many-to-many junction table（Database Design 25分）
+### C. Many-to-many junction table（Database Design 25分） [done]
 要求 at least one many-to-many via junction table。
 - `Stay` 連接 User ↔ Room，屬於 associative entity，應可算數，但要在 write-up 中說明清楚。
 
@@ -46,6 +46,7 @@
 2. UI Improvement
 	- item內部能處理CRUD，而不是Form based
 	- 排版問題
+3. ListView預製Item分頁提供內容(很慢)
 
 ## 非程式項目
 

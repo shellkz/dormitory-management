@@ -1,6 +1,6 @@
 import db
 
-VALID_STATUS = {"available", "occupied", "maintaining"}
+VALID_STATUS = {"available", "occupied"}
 VALID_TYPE = {"small", "medium", "large"}
 
 
@@ -28,7 +28,7 @@ def is_id_valid(id: int) -> bool:
 
 def get_rooms(
     status: str | None = None, _type: str | None = None, floor: int | None = None
-) -> list[db.Room]:
+) -> list[db.RoomRead]:
     if not is_status_valid(status):
         raise ValueError("[Room] Invalid status value.")
     if not is_type_valid(_type):

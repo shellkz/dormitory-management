@@ -20,6 +20,7 @@ from .models import (
     RequestMaintenance,
     RequestMaintenanceRead,
     Room,
+    RoomRead,
     Stay,
     StayRead,
     User,

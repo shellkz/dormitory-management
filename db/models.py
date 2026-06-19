@@ -21,6 +21,14 @@ class Room:
 
 
 @dataclass
+class RoomRead:
+    id: int
+    type: str
+    floor: int
+    status: str
+
+
+@dataclass
 class Stay:
     id: int
     resident_id: int
