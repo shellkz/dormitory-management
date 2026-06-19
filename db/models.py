@@ -52,3 +52,20 @@ class RequestMaintenance:
     created_at: str
     processing_at: Optional[str]
     completed_at: Optional[str]
+
+
+@dataclass
+class RequestMaintenanceRead:
+    id: int
+    created_by: int
+    username: str
+
+    room_id: int
+    type: str
+    floor: int
+
+    status: str
+    description: str
+    created_at: str
+    processing_at: Optional[str]
+    completed_at: Optional[str]

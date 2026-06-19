@@ -157,6 +157,7 @@ AssignItem (CTkFrame)
 ## RequestMaintenanceFrame
 
 0. Functionality
+Submit and track maintenance requests
 - admin:  submit request/query all request / update request progress
 - resident: submit request/query self request
 
@@ -166,59 +167,46 @@ AssignItem (CTkFrame)
 
 2. Component structure 
 ```
-MaintenanceFrame (admin)
-    CTkScrollableFrame
-        AdminMaintenanceItem (CTkFrame) × N
 
-AdminMaintenanceItem (CTkFrame)
-    Hbox
-        IdLabel
-        RoomLabel
-        SubmitterLabel
-        DescriptionLabel
-
-        [submitted 模式]
-        SubmittedAtLabel        ← 提交於 xxx
-        ProcessButton           ← 按下 → processing
-
-        [processing 模式]
-        SubmittedAtLabel        ← 提交於 xxx
-        ProcessingAtLabel       ← 受理於 xxx
-        CompleteButton          ← 按下 → completed
-
-        [completed 模式]
-        SubmittedAtLabel        ← 提交於 xxx
-        ProcessingAtLabel       ← 受理於 xxx
-        CompletedAtLabel        ← 完成於 xxx
-```
-
-MaintenanceFrame (resident)
-    CreateMaintenanceForm (CTkFrame)
-        Hbox
-            RoomLabel           ← 目前住的房間 id/type/floor
-            DescriptionEntry
+MaintenanceFrame
+    
+    ActionTabContainer
+        ProcessTab(admin only)
+            RequestIdEntry
+            ProcessButton
+        CompleteTab(admin only)
+            RequestIdEntry
+            CompleteButton
+        SubmitTab
+            RoomIdEntry
+            DescriptionEntry (multiline)
             SubmitButton
 
-    CTkScrollableFrame
-        ResidentMaintenanceItem (CTkFrame) × N
+    MaintenanceViewer
+        # Serach Filter
+        SearchFilterContainer
+            StatusOptions(all/submitted/processing/completed)               
+            UsernameEntry(find all maintenance request created by this user)    (admin only, resident only see their request)
+            RoomIdEntry(find all maintenance request for this room)             (admin only, resident only see their request)
+            SearchButton
+            
+        # List
+        CTkScrollableFrame
+            MaintenanceItem (CTkFrame) × N
 
-ResidentMaintenanceItem (CTkFrame)
-    Hbox
-        IdLabel
-        RoomLabel
+MaintenanceRequestItem
+    VBox
+        Hbox
+            IdLabel
+            RoomLabel
+            SubmitterLabel
+
+            SubmittedAtLabel
+            ProcessingAtLabel
+            CompletedAtLabel
+
         DescriptionLabel
 
-        [submitted 模式]
-        SubmittedAtLabel        ← 提交於 xxx
-
-        [processing 模式]
-        SubmittedAtLabel        ← 提交於 xxx
-        ProcessingAtLabel       ← 受理於 xxx
-
-        [completed 模式]
-        SubmittedAtLabel        ← 提交於 xxx
-        ProcessingAtLabel       ← 受理於 xxx
-        CompletedAtLabel        ← 完成於 xxx
 3. Menu transition
 
 

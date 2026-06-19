@@ -3,7 +3,7 @@ import sqlite3
 from datetime import datetime
 from typing import Optional
 
-from .models import Room, Stay, StayRead, User
+from .models import RequestMaintenanceRead, Room, Stay, StayRead, User
 
 DATEBASE_NAME = "dorm.db"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -40,6 +40,20 @@ def get_user(username: str) -> Optional[User]:
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM User WHERE username = ?", (username,))
+        user = cursor.fetchone()
+    finally:
+        if conn:
+            conn.close()
+    return User(**user) if user else None
+
+
+def get_user_by_id(id: int) -> Optional[User]:
+    conn = None
+    user = None
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM User WHERE id = ?", (id,))
         user = cursor.fetchone()
     finally:
         if conn:
@@ -335,6 +349,152 @@ def check_out(room_id: int):
     finally:
         if conn:
             conn.close()
+
+
+## RequestMaintenance
+def submit_maintenance_request(room_id: int, description: str, created_by: int):
+    # No such user
+    user = get_user_by_id(created_by)
+    if not user:
+        raise ValueError(f"[Maintenance] No such user id {created_by}.")
+
+    # No such room
+    if not get_rooms(id=room_id):
+        raise ValueError(f"[Maintenance] No such room id is {room_id}.")
+
+    # Submit
+    conn = None
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            INSERT INTO 
+            RequestMaintenance  (created_by, room_id, status, description, created_at) 
+            VALUES              (?, ?, ?, ?, ?) 
+            """,
+            (created_by, room_id, "submitted", description, current_datetime()),
+        )
+        conn.commit()
+    finally:
+        if conn:
+            conn.close()
+
+
+def process_maintenance_request(id: int):
+    # No such request
+    request = get_maintenance_requests(id=id)
+    request = request[0] if request else None
+    if not request:
+        raise ValueError(f"[Maintenance] No such request id {id}")
+
+    # Request is not in status "submitted"
+    if request.status != "submitted":
+        raise ValueError("[Maintenance] Target maintenance is not in submitted status.")
+
+    # Process
+    conn = None
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            UPDATE  RequestMaintenance 
+            SET     status = "processing", processing_at = ? 
+            WHERE   id = ? 
+            """,
+            (
+                current_datetime(),
+                id,
+            ),
+        )
+        conn.commit()
+    finally:
+        if conn:
+            conn.close()
+
+
+def complete_maintenance_request(id: int):
+    # No such request
+    request = get_maintenance_requests(id=id)
+    request = request[0] if request else None
+    if not request:
+        raise ValueError(f"[Maintenance] No such request id {id}")
+
+    # Request is not in status "processing"
+    if request.status != "processing":
+        raise ValueError(
+            "[Maintenance] Target maintenance is not in processing status."
+        )
+
+    # Complete
+    conn = None
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            UPDATE  RequestMaintenance 
+            SET     status = "completed", completed_at = ? 
+            WHERE   id = ? 
+            """,
+            (
+                current_datetime(),
+                id,
+            ),
+        )
+        conn.commit()
+    finally:
+        if conn:
+            conn.close()
+
+
+def get_maintenance_requests(
+    id: int | None = None,
+    status: str | None = None,
+    username: str | None = None,
+    room_id: int | None = None,
+) -> list[RequestMaintenanceRead]:
+    conn = None
+    results: list[RequestMaintenanceRead] = []
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        conditions = []
+        params = []
+
+        if id is not None:
+            conditions.append("RequestMaintenance.id = ?")
+            params.append(id)
+        if status is not None:
+            conditions.append("RequestMaintenance.status = ?")
+            params.append(status)
+        if username is not None:
+            conditions.append("User.username = ?")
+            params.append(username)
+        if room_id is not None:
+            conditions.append("RequestMaintenance.room_id = ?")
+            params.append(room_id)
+
+        sql = "SELECT RequestMaintenance.id, RequestMaintenance.created_by, RequestMaintenance.room_id, RequestMaintenance.status, RequestMaintenance.description, RequestMaintenance.created_at, RequestMaintenance.processing_at, RequestMaintenance.completed_at, "
+        sql += "User.username, "
+        sql += "Room.type, Room.floor "
+        sql += "FROM RequestMaintenance "
+        sql += "JOIN Room ON RequestMaintenance.room_id = Room.id "
+        sql += "JOIN User ON RequestMaintenance.created_by = User.id "
+        if conditions:
+            sql += "WHERE " + " AND ".join(conditions)
+        sql += "ORDER BY RequestMaintenance.id DESC "
+        cursor.execute(sql, params)
+
+        for request in cursor.fetchall():
+            results.append(RequestMaintenanceRead(**request))
+
+    finally:
+        if conn:
+            conn.close()
+    return results
 
 
 # if __name__ == "__main__":
