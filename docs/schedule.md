@@ -31,7 +31,7 @@
 1. Room search filter(all/occupied/available)
 
 
-### B. LIKE 搜尋（Application Features 25分）
+### B. LIKE 搜尋（Application Features 25分）[done]
 要求 at least one search using `LIKE` or comparison operators，目前全部是 `= ?` 完全匹配。
 - 建議：maintenance viewer 的 username 搜尋改成 `LIKE ?`（加 % 模糊搜）
 
@@ -42,11 +42,24 @@
 ---
 
 ## 選做改善
-1. Logout
-2. UI Improvement
-	- item內部能處理CRUD，而不是Form based
-	- 排版問題
+1. 統一用表單提交觸發DB操作(雖然是退後 但統一)
+2. 統一排版，由上到下分別是
+```
+TabContainer
+	TabForSomeAction
+		InputField
+		Button
+	TabForOtherActions
+		...
+	List
+		Item
+		Item
+		...
+```
 3. ListView預製Item分頁提供內容(很慢)
+
+## 墳場
+1. Logout 
 
 ## 非程式項目
 
