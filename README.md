@@ -25,3 +25,12 @@ source venv/bin/activate
 pip install -r requirements.txt
 python main.py
 ```
+
+# Default users for test
+1. admin
+username: `admin`
+password: `admin`
+
+2. resident
+username: `resident`
+password: `resident`

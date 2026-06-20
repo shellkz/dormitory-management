@@ -68,4 +68,4 @@ TabContainer
 | ER Diagram | 手繪，PK 底線，標示 cardinality，需清晰可讀 | 10 | O |
 | Write-up | 3–4 頁 PDF，含 schema 設計說明 + AI 使用聲明 | 10 |  |
 | Demo Video | 3 分鐘內，展示 admin/resident 兩種角色操作 | 10 |  |
-| README | 說明如何執行程式 | — |  |
+| README | 說明如何執行程式 | — | O |
