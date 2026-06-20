@@ -9,11 +9,8 @@ class AuthFrame(ctk.CTkFrame):
     def __init__(self, parent, **kwargs):
         super().__init__(parent, **kwargs)
 
-        container = ctk.CTkFrame(self, fg_color="transparent")
-        container.place(relx=0.5, rely=0.5, anchor="center")
-
-        tabs = ctk.CTkTabview(container, width=320)
-        tabs.pack()
+        tabs = ctk.CTkTabview(self, width=320)
+        tabs.place(relx=0.5, rely=0.5, anchor="center")
 
         self._build_login_tab(tabs.add("登入"))
         self._build_register_tab(tabs.add("註冊"))

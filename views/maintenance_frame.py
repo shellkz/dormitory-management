@@ -15,88 +15,120 @@ class MaintenanceFrame(ctk.CTkFrame):
     def __init__(self, parent, **kwargs):
         super().__init__(parent, **kwargs)
         self.is_admin = None
+        self.current_user = None
         self.current_username = None
 
-        # Admin-only: Process & Complete tabs (not packed until _resumed)
-        self.admin_action_tabs = ctk.CTkTabview(self)
+        # Submit tab (all users)
+        self.tab_container = ctk.CTkTabview(self, height=70)
+        self.tab_container.pack(fill="x", padx=10, pady=(5, 0))
+        self._build_submit_form(self.tab_container.add("提交申請"))
 
-        process_tab = self.admin_action_tabs.add("Process")
-        process_row = ctk.CTkFrame(process_tab)
-        process_row.pack()
-        self.process_id_entry = ctk.CTkEntry(process_row, placeholder_text="Request ID")
-        self.process_id_entry.pack(side="left", padx=5)
-        ctk.CTkButton(process_row, text="Process", command=self._on_process).pack(
-            side="left", padx=5
-        )
+        # Admin-only action tabs — packed dynamically in _resumed
+        self.admin_tab_container = ctk.CTkTabview(self, height=70)
+        self._build_process_form(self.admin_tab_container.add("處理申請"))
+        self._build_complete_form(self.admin_tab_container.add("完成申請"))
 
-        complete_tab = self.admin_action_tabs.add("Complete")
-        complete_row = ctk.CTkFrame(complete_tab)
-        complete_row.pack()
-        self.complete_id_entry = ctk.CTkEntry(
-            complete_row, placeholder_text="Request ID"
-        )
-        self.complete_id_entry.pack(side="left", padx=5)
-        ctk.CTkButton(complete_row, text="Complete", command=self._on_complete).pack(
-            side="left", padx=5
-        )
+        # content: SearchForm (row 0) + ColumnHeader (row 1) + ListView (row 2)
+        self.content = ctk.CTkFrame(self)
+        self.content.pack(fill="both", expand=True, padx=10, pady=5)
+        self.content.rowconfigure(2, weight=1)
+        self.content.grid_columnconfigure(6, weight=1)
 
-        # Submit form (all users)
-        self.submit_form = ctk.CTkFrame(self)
-        self.submit_form.pack(fill="x", padx=10, pady=5)
-        ctk.CTkLabel(self.submit_form, text="Submit Maintenance Request").pack(
-            anchor="w", padx=5
-        )
-        submit_row = ctk.CTkFrame(self.submit_form)
-        submit_row.pack()
-        self.submit_room_id_entry = ctk.CTkEntry(submit_row, placeholder_text="Room ID")
-        self.submit_room_id_entry.pack(side="left", padx=5)
-        self.submit_description_entry = ctk.CTkEntry(
-            submit_row, placeholder_text="Description", width=200
-        )
-        self.submit_description_entry.pack(side="left", padx=5)
-        ctk.CTkButton(submit_row, text="Submit", command=self._on_submit).pack(
-            side="left", padx=5
-        )
-
-        # Search filter
-        filter_container = ctk.CTkFrame(self)
-        filter_container.pack(fill="x", padx=10, pady=5)
-
-        filter_row = ctk.CTkFrame(filter_container)
-        filter_row.pack()
-        self.search_status_option = ctk.CTkOptionMenu(
-            filter_row, values=["all", "submitted", "processing", "completed"]
-        )
-        self.search_status_option.pack(side="left", padx=5)
-        ctk.CTkButton(filter_row, text="Search", command=self._on_search).pack(
-            side="left", padx=5
-        )
-
-        # Admin-only filter fields (not packed until _resumed)
-        self.admin_filter_container = ctk.CTkFrame(filter_container)
-        admin_filter_row = ctk.CTkFrame(self.admin_filter_container)
-        admin_filter_row.pack()
-        self.search_username_entry = ctk.CTkEntry(
-            admin_filter_row, placeholder_text="Username"
-        )
-        self.search_username_entry.pack(side="left", padx=5)
+        # SearchForm (row 0) — admin-only entries hidden via grid_remove in _resumed
         self.search_room_id_entry = ctk.CTkEntry(
-            admin_filter_row, placeholder_text="Room ID"
+            self.content, width=60, placeholder_text="Room"
         )
-        self.search_room_id_entry.pack(side="left", padx=5)
+        self.search_room_id_entry.grid(row=0, column=1, padx=2, pady=5)
 
-        # List header
-        header = ctk.CTkFrame(self)
-        header.pack(fill="x", padx=10)
-        ctk.CTkLabel(header, text="ID", width=40).pack(side="left")
-        ctk.CTkLabel(header, text="Room", width=60).pack(side="left")
-        ctk.CTkLabel(header, text="Submitter", width=100).pack(side="left")
-        ctk.CTkLabel(header, text="Submitted At", width=140).pack(side="left")
-        ctk.CTkLabel(header, text="Processing At", width=140).pack(side="left")
-        ctk.CTkLabel(header, text="Completed At", width=140).pack(side="left")
+        self.search_username_entry = ctk.CTkEntry(
+            self.content, width=100, placeholder_text="Username"
+        )
+        self.search_username_entry.grid(row=0, column=2, padx=2, pady=5)
 
-        self.request_list = ctk.CTkScrollableFrame(self)
-        self.request_list.pack(fill="both", expand=True, padx=10, pady=5)
+        self.search_status_option = ctk.CTkOptionMenu(
+            self.content,
+            values=["all", "submitted", "processing", "completed"],
+            width=140,
+        )
+        self.search_status_option.grid(row=0, column=3, padx=2, pady=5)
+
+        ctk.CTkButton(
+            self.content, text="Search", command=self._on_search, width=80
+        ).grid(row=0, column=4, padx=2, pady=5)
+
+        # ColumnHeader (row 1)
+        ctk.CTkLabel(self.content, text="ID", width=40).grid(row=1, column=0, padx=2)
+        ctk.CTkLabel(self.content, text="Room", width=60).grid(row=1, column=1, padx=2)
+        ctk.CTkLabel(self.content, text="Submitter", width=100).grid(row=1, column=2, padx=2)
+        ctk.CTkLabel(self.content, text="Submitted At", width=140).grid(row=1, column=3, padx=2)
+        ctk.CTkLabel(self.content, text="Processing At", width=140).grid(row=1, column=4, padx=2)
+        ctk.CTkLabel(self.content, text="Completed At", width=140).grid(row=1, column=5, padx=2)
+
+        # ListView (row 2)
+        self.request_list = ctk.CTkScrollableFrame(self.content)
+        self.request_list.grid(row=2, column=0, columnspan=7, sticky="nsew")
+
+    def _build_submit_form(self, tab):
+        tab.grid_columnconfigure(0, minsize=44)   # ID spacer      (40 + 2+2)
+        tab.grid_columnconfigure(2, minsize=104)  # Submitter spacer (100 + 2+2)
+        tab.grid_columnconfigure(3, minsize=144)  # Submitted At spacer (140 + 2+2)
+        tab.grid_columnconfigure(4, minsize=144)  # Processing At spacer (140 + 2+2)
+        tab.grid_columnconfigure(6, weight=1)
+
+        self.submit_room_id_entry = ctk.CTkEntry(tab, width=60, placeholder_text="Room ID")
+        self.submit_room_id_entry.grid(row=0, column=1, padx=2, pady=5)
+
+        self.submit_description_entry = ctk.CTkEntry(tab, placeholder_text="Description")
+        self.submit_description_entry.grid(
+            row=0, column=2, columnspan=3, padx=2, pady=5, sticky="ew"
+        )
+
+        ctk.CTkButton(tab, text="Submit", command=self._on_submit, width=80).grid(
+            row=0, column=5, padx=2, pady=5
+        )
+
+    def _build_process_form(self, tab):
+        tab.grid_columnconfigure(1, minsize=64)   # Room spacer      (60  + 2+2)
+        tab.grid_columnconfigure(2, minsize=104)  # Submitter spacer (100 + 2+2)
+        tab.grid_columnconfigure(3, minsize=144)  # Submitted At spacer (140 + 2+2)
+        tab.grid_columnconfigure(4, minsize=144)  # Processing At spacer (140 + 2+2)
+        tab.grid_columnconfigure(6, weight=1)
+
+        self.process_id_entry = ctk.CTkEntry(tab, width=40, placeholder_text="ID")
+        self.process_id_entry.grid(row=0, column=0, padx=2, pady=5)
+
+        ctk.CTkButton(tab, text="Process", command=self._on_process, width=80).grid(
+            row=0, column=5, padx=2, pady=5
+        )
+
+    def _build_complete_form(self, tab):
+        tab.grid_columnconfigure(1, minsize=64)   # Room spacer
+        tab.grid_columnconfigure(2, minsize=104)  # Submitter spacer
+        tab.grid_columnconfigure(3, minsize=144)  # Submitted At spacer
+        tab.grid_columnconfigure(4, minsize=144)  # Processing At spacer
+        tab.grid_columnconfigure(6, weight=1)
+
+        self.complete_id_entry = ctk.CTkEntry(tab, width=40, placeholder_text="ID")
+        self.complete_id_entry.grid(row=0, column=0, padx=2, pady=5)
+
+        ctk.CTkButton(tab, text="Complete", command=self._on_complete, width=80).grid(
+            row=0, column=5, padx=2, pady=5
+        )
+
+    def _on_submit(self):
+        try:
+            _room_id = int(self.submit_room_id_entry.get())
+            _description = self.submit_description_entry.get()
+        except Exception:
+            messagebox.showerror("Error", "Room ID should be a number.")
+            return
+        try:
+            submit_request(_room_id, _description, self.current_user)
+            self.submit_room_id_entry.delete(0, "end")
+            self.submit_description_entry.delete(0, "end")
+            self._refresh_list()
+        except Exception as e:
+            messagebox.showerror("Error", e)
 
     def _on_process(self):
         try:
@@ -120,22 +152,6 @@ class MaintenanceFrame(ctk.CTkFrame):
         try:
             complete_request(_id)
             self.complete_id_entry.delete(0, "end")
-            self._refresh_list()
-        except Exception as e:
-            messagebox.showerror("Error", e)
-
-    def _on_submit(self):
-        try:
-            _room_id = int(self.submit_room_id_entry.get())
-            _description = self.submit_description_entry.get()
-        except Exception:
-            messagebox.showerror("Error", "Room ID should be a number.")
-            return
-        try:
-            _created_by = self.winfo_toplevel().context.current_user.id
-            submit_request(_room_id, _description, self.current_user)
-            self.submit_room_id_entry.delete(0, "end")
-            self.submit_description_entry.delete(0, "end")
             self._refresh_list()
         except Exception as e:
             messagebox.showerror("Error", e)
@@ -170,18 +186,19 @@ class MaintenanceFrame(ctk.CTkFrame):
 
     def _resumed(self):
         self.current_user = self.winfo_toplevel().context.current_user
-        role = self.winfo_toplevel().context.current_user.role
-        self.current_username = self.winfo_toplevel().context.current_user.username
-        self.is_admin = role == "admin"
+        self.current_username = self.current_user.username
+        self.is_admin = self.current_user.role == "admin"
 
         if self.is_admin:
-            self.admin_action_tabs.pack(
-                fill="x", padx=10, pady=5, before=self.submit_form
+            self.admin_tab_container.pack(
+                fill="x", padx=10, pady=(5, 0), before=self.content
             )
-            self.admin_filter_container.pack()
+            self.search_room_id_entry.grid()
+            self.search_username_entry.grid()
         else:
-            self.admin_action_tabs.pack_forget()
-            self.admin_filter_container.pack_forget()
+            self.admin_tab_container.pack_forget()
+            self.search_room_id_entry.grid_remove()
+            self.search_username_entry.grid_remove()
 
         self._refresh_list()
 
@@ -199,15 +216,15 @@ class MaintenanceItem(ctk.CTkFrame):
         hbox = ctk.CTkFrame(self)
         hbox.pack(fill="x")
 
-        ctk.CTkLabel(hbox, text=str(request.id), width=40).pack(side="left")
-        ctk.CTkLabel(hbox, text=str(request.room_id), width=60).pack(side="left")
-        ctk.CTkLabel(hbox, text=request.username, width=100).pack(side="left")
-        ctk.CTkLabel(hbox, text=request.created_at, width=140).pack(side="left")
-        ctk.CTkLabel(hbox, text=request.processing_at or "-", width=140).pack(
-            side="left"
+        ctk.CTkLabel(hbox, text=str(request.id), width=40).grid(row=0, column=0, padx=2)
+        ctk.CTkLabel(hbox, text=str(request.room_id), width=60).grid(row=0, column=1, padx=2)
+        ctk.CTkLabel(hbox, text=request.username, width=100).grid(row=0, column=2, padx=2)
+        ctk.CTkLabel(hbox, text=request.created_at, width=140).grid(row=0, column=3, padx=2)
+        ctk.CTkLabel(hbox, text=request.processing_at or "-", width=140).grid(
+            row=0, column=4, padx=2
         )
-        ctk.CTkLabel(hbox, text=request.completed_at or "-", width=140).pack(
-            side="left"
+        ctk.CTkLabel(hbox, text=request.completed_at or "-", width=140).grid(
+            row=0, column=5, padx=2
         )
 
         ctk.CTkLabel(self, text=request.description, anchor="w").pack(fill="x", padx=5)

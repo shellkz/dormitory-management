@@ -10,66 +10,62 @@ class AssignFrame(ctk.CTkFrame):
     def __init__(self, parent, **kwargs):
         super().__init__(parent, **kwargs)
 
-        # CheckInForm
-        self.check_in_form = ctk.CTkFrame(self)
-        self.check_in_form.pack(fill="x", padx=10, pady=5)
+        # TabContainer
+        self.tab_container = ctk.CTkTabview(self, height=70)
+        self.tab_container.pack(fill="x", padx=10, pady=(5, 0))
+        self._build_check_in_form(self.tab_container.add("辦理入住"))
+        self._build_check_out_form(self.tab_container.add("辦理退房"))
 
-        ctk.CTkLabel(self.check_in_form, text="辦理入住").pack(anchor="w", padx=5)
+        # content: ColumnHeader (row 0) + ListView (row 1)
+        self.content = ctk.CTkFrame(self)
+        self.content.pack(fill="both", expand=True, padx=10, pady=5)
+        self.content.rowconfigure(1, weight=1)
+        self.content.grid_columnconfigure(6, weight=1)
 
-        check_in_row = ctk.CTkFrame(self.check_in_form)
-        check_in_row.pack()
+        # ColumnHeader
+        ctk.CTkLabel(self.content, text="Room ID", width=80).grid(row=0, column=0, padx=2)
+        ctk.CTkLabel(self.content, text="Type", width=100).grid(row=0, column=1, padx=2)
+        ctk.CTkLabel(self.content, text="Floor", width=60).grid(row=0, column=2, padx=2)
+        ctk.CTkLabel(self.content, text="Resident", width=120).grid(row=0, column=3, padx=2)
+        ctk.CTkLabel(self.content, text="Check-In At", width=160).grid(row=0, column=4, padx=2)
+        ctk.CTkLabel(self.content, text="Check-Out At", width=160).grid(row=0, column=5, padx=2)
 
-        self.check_in_username_entry = ctk.CTkEntry(
-            check_in_row, placeholder_text="Username"
-        )
-        self.check_in_username_entry.pack(side="left", padx=5)
+        # ListView
+        self.assign_list = ctk.CTkScrollableFrame(self.content)
+        self.assign_list.grid(row=1, column=0, columnspan=7, sticky="nsew")
 
-        self.check_in_room_id_entry = ctk.CTkEntry(
-            check_in_row, placeholder_text="Room ID"
-        )
-        self.check_in_room_id_entry.pack(side="left", padx=5)
+    def _build_check_in_form(self, tab):
+        tab.grid_columnconfigure(1, minsize=104)  # Type spacer   (100 + 2+2)
+        tab.grid_columnconfigure(2, minsize=64)   # Floor spacer  (60  + 2+2)
+        tab.grid_columnconfigure(6, weight=1)
 
-        ctk.CTkButton(check_in_row, text="Check In", command=self._on_check_in).pack(
-            side="left", padx=5
-        )
+        self.check_in_room_id_entry = ctk.CTkEntry(tab, width=80, placeholder_text="Room ID")
+        self.check_in_room_id_entry.grid(row=0, column=0, padx=2, pady=5)
 
-        # CheckOutForm
-        self.check_out_form = ctk.CTkFrame(self)
-        self.check_out_form.pack(fill="x", padx=10, pady=5)
+        self.check_in_username_entry = ctk.CTkEntry(tab, width=120, placeholder_text="Username")
+        self.check_in_username_entry.grid(row=0, column=3, padx=2, pady=5)
 
-        ctk.CTkLabel(self.check_out_form, text="辦理退房").pack(anchor="w", padx=5)
-
-        check_out_row = ctk.CTkFrame(self.check_out_form)
-        check_out_row.pack()
-
-        self.check_out_room_id_entry = ctk.CTkEntry(
-            check_out_row, placeholder_text="Room ID"
-        )
-        self.check_out_room_id_entry.pack(side="left", padx=5)
-
-        ctk.CTkButton(check_out_row, text="Check Out", command=self._on_check_out).pack(
-            side="left", padx=5
+        ctk.CTkButton(tab, text="Check In", command=self._on_check_in, width=80).grid(
+            row=0, column=4, padx=2, pady=5
         )
 
-        # AssignList header
-        header = ctk.CTkFrame(self)
-        header.pack(fill="x", padx=10)
-        ctk.CTkLabel(header, text="Room ID", width=80).pack(side="left")
-        ctk.CTkLabel(header, text="Type", width=100).pack(side="left")
-        ctk.CTkLabel(header, text="Floor", width=60).pack(side="left")
-        ctk.CTkLabel(header, text="Resident", width=120).pack(side="left")
-        ctk.CTkLabel(header, text="Check-In At", width=160).pack(side="left")
-        ctk.CTkLabel(header, text="Check-Out At", width=160).pack(side="left")
+    def _build_check_out_form(self, tab):
+        tab.grid_columnconfigure(1, minsize=104)  # Type spacer     (100 + 2+2)
+        tab.grid_columnconfigure(2, minsize=64)   # Floor spacer    (60  + 2+2)
+        tab.grid_columnconfigure(3, minsize=124)  # Resident spacer (120 + 2+2)
+        tab.grid_columnconfigure(6, weight=1)
 
-        self.assign_list = ctk.CTkScrollableFrame(self)
-        self.assign_list.pack(fill="both", expand=True, padx=10, pady=5)
+        self.check_out_room_id_entry = ctk.CTkEntry(tab, width=80, placeholder_text="Room ID")
+        self.check_out_room_id_entry.grid(row=0, column=0, padx=2, pady=5)
+
+        ctk.CTkButton(tab, text="Check Out", command=self._on_check_out, width=80).grid(
+            row=0, column=4, padx=2, pady=5
+        )
 
     def _on_check_in(self):
-        # verify username and room_id
         try:
             _username = self.check_in_username_entry.get()
-            _room_id = self.check_in_room_id_entry.get()
-            _room_id = int(_room_id)
+            _room_id = int(self.check_in_room_id_entry.get())
         except Exception:
             messagebox.showerror(
                 "Error",
@@ -79,15 +75,12 @@ class AssignFrame(ctk.CTkFrame):
         try:
             check_in(_username, _room_id)
             self.show_stays(get_stays())
-            pass
         except Exception as e:
             messagebox.showerror("Error", e)
 
     def _on_check_out(self):
-        # verify room_id
         try:
-            _room_id = self.check_out_room_id_entry.get()
-            _room_id = int(_room_id)
+            _room_id = int(self.check_out_room_id_entry.get())
         except Exception:
             messagebox.showerror(
                 "Error",
@@ -97,7 +90,6 @@ class AssignFrame(ctk.CTkFrame):
         try:
             check_out(_room_id)
             self.show_stays(get_stays())
-            pass
         except Exception as e:
             messagebox.showerror("Error", e)
 
@@ -105,7 +97,6 @@ class AssignFrame(ctk.CTkFrame):
         stays = get_stays()
         print(f"{len(stays)} stays found.")
         self.show_stays(stays)
-        pass
 
     def show_stays(self, stays: list[StayRead]):
         for widget in self.assign_list.winfo_children():
@@ -121,13 +112,15 @@ class AssignItem(ctk.CTkFrame):
         hbox = ctk.CTkFrame(self)
         hbox.pack(fill="x")
 
-        ctk.CTkLabel(hbox, text=str(stay.room_id), width=80).pack(side="left")
-        ctk.CTkLabel(hbox, text=stay.type, width=100).pack(side="left")
-        ctk.CTkLabel(hbox, text=str(stay.floor), width=60).pack(side="left")
+        ctk.CTkLabel(hbox, text=str(stay.room_id), width=80).grid(row=0, column=0, padx=2)
+        ctk.CTkLabel(hbox, text=stay.type, width=100).grid(row=0, column=1, padx=2)
+        ctk.CTkLabel(hbox, text=str(stay.floor), width=60).grid(row=0, column=2, padx=2)
 
         if stay.check_in_at:
-            ctk.CTkLabel(hbox, text=stay.username, width=120).pack(side="left")
-            ctk.CTkLabel(hbox, text=stay.check_in_at, width=160).pack(side="left")
+            ctk.CTkLabel(hbox, text=stay.username, width=120).grid(row=0, column=3, padx=2)
+            ctk.CTkLabel(hbox, text=stay.check_in_at, width=160).grid(row=0, column=4, padx=2)
 
             if stay.check_out_at:
-                ctk.CTkLabel(hbox, text=stay.check_out_at, width=160).pack(side="left")
+                ctk.CTkLabel(hbox, text=stay.check_out_at, width=160).grid(
+                    row=0, column=5, padx=2
+                )

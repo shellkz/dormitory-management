@@ -19,54 +19,65 @@ class RoomFrame(ctk.CTkFrame):
         super().__init__(parent, **kwargs)
         self.is_admin = None
 
-        # SearchBar
-        search_bar = ctk.CTkFrame(self)
-        search_bar.pack(fill="x", padx=10, pady=5)
+        # TabContainer (admin only, packed dynamically in _resumed)
+        self.tab_container = ctk.CTkTabview(self, height=70)
+        self._build_create_form(self.tab_container.add("新增房間"))
 
-        search_row = ctk.CTkFrame(search_bar)
-        search_row.pack()
+        # content: SearchRoomForm (row 0) + ColumnNameHeader (row 1) + ListView (row 2)
+        # All three share the same grid so columns align automatically.
+        self.content = ctk.CTkFrame(self)
+        self.content.pack(fill="both", expand=True, padx=10, pady=5)
+        self.content.rowconfigure(2, weight=1)
+        self.content.grid_columnconfigure(0, minsize=60)  # ID — no search widget here
+        self.content.grid_columnconfigure(6, weight=1)    # spacer: absorbs remaining width
+
+        # SearchRoomForm
+        self.search_type_option = ctk.CTkOptionMenu(
+            self.content, values=["all"] + sorted(VALID_TYPE), width=100
+        )
+        self.search_type_option.grid(row=0, column=1, padx=2, pady=5)
+
+        self.search_floor_input = ctk.CTkEntry(
+            self.content, width=60, placeholder_text="Floor"
+        )
+        self.search_floor_input.grid(row=0, column=2, padx=2, pady=5)
 
         self.search_status_option = ctk.CTkOptionMenu(
-            search_row, values=["all"] + sorted(VALID_STATUS)
+            self.content, values=["all"] + sorted(VALID_STATUS), width=100
         )
-        self.search_status_option.pack(side="left", padx=5)
+        self.search_status_option.grid(row=0, column=3, padx=2, pady=5)
 
-        self.search_type_option = ctk.CTkOptionMenu(
-            search_row, values=["all"] + sorted(VALID_TYPE)
+        ctk.CTkButton(
+            self.content, text="Search", command=self.on_search, width=80
+        ).grid(row=0, column=4, padx=2, pady=5)
+        ctk.CTkButton(
+            self.content, text="Reset", command=self.on_reset_search, width=80
+        ).grid(row=0, column=5, padx=2, pady=5)
+
+        # ColumnNameHeader
+        ctk.CTkLabel(self.content, text="ID", width=60).grid(row=1, column=0, padx=2)
+        ctk.CTkLabel(self.content, text="Type", width=100).grid(row=1, column=1, padx=2)
+        ctk.CTkLabel(self.content, text="Floor", width=60).grid(row=1, column=2, padx=2)
+        ctk.CTkLabel(self.content, text="Status", width=100).grid(
+            row=1, column=3, padx=2
         )
-        self.search_type_option.pack(side="left", padx=5)
-        self.search_floor_input = ctk.CTkEntry(search_row, placeholder_text="Floor")
-        self.search_floor_input.pack(side="left", padx=5)
 
-        ctk.CTkButton(search_row, text="Search", command=self.on_search).pack(
-            side="left", padx=5
-        )
-        ctk.CTkButton(search_row, text="Reset", command=self.on_reset_search).pack(
-            side="left", padx=5
-        )
+        # ListView
+        self.room_list = ctk.CTkScrollableFrame(self.content)
+        self.room_list.grid(row=2, column=0, columnspan=7, sticky="nsew")
 
-        # RoomList
-        header = ctk.CTkFrame(self)
-        header.pack(fill="x", padx=10)
-        ctk.CTkLabel(header, text="ID", width=60).pack(side="left")
-        ctk.CTkLabel(header, text="Type", width=100).pack(side="left")
-        ctk.CTkLabel(header, text="Floor", width=60).pack(side="left")
-        ctk.CTkLabel(header, text="Status", width=100).pack(side="left")
+    def _build_create_form(self, tab):
+        tab.grid_columnconfigure(0, minsize=64)  # 60 (width) + 2+2 (padx) to match list items
+        tab.grid_columnconfigure(6, weight=1)
 
-        self.room_list = ctk.CTkScrollableFrame(self)
-        self.room_list.pack(fill="both", expand=True, padx=10, pady=5)
+        self.create_type_option = ctk.CTkOptionMenu(tab, values=sorted(VALID_TYPE), width=100)
+        self.create_type_option.grid(row=0, column=1, padx=2, pady=5)
 
-        # CreateRoomForm (admin only, hidden by default)
-        self.create_form = ctk.CTkFrame(self)
-        form_row = ctk.CTkFrame(self.create_form)
-        form_row.pack()
+        self.create_floor_input = ctk.CTkEntry(tab, width=60, placeholder_text="Floor")
+        self.create_floor_input.grid(row=0, column=2, padx=2, pady=5)
 
-        self.create_type_option = ctk.CTkOptionMenu(form_row, values=sorted(VALID_TYPE))
-        self.create_type_option.pack(side="left", padx=5)
-        self.create_floor_input = ctk.CTkEntry(form_row, placeholder_text="Floor")
-        self.create_floor_input.pack(side="left", padx=5)
-        ctk.CTkButton(form_row, text="Create", command=self.on_create).pack(
-            side="left", padx=5
+        ctk.CTkButton(tab, text="Create", command=self.on_create, width=80).grid(
+            row=0, column=4, padx=2, pady=5
         )
 
     def on_search(self):
@@ -94,11 +105,9 @@ class RoomFrame(ctk.CTkFrame):
 
     def on_reset_search(self):
         try:
-            # reset filter components
             self.search_status_option.set("all")
             self.search_type_option.set("all")
             self.search_floor_input.delete(0, "end")
-
             self.show_rooms(get_rooms())
         except Exception as e:
             messagebox.showerror("Error", e)
@@ -159,9 +168,9 @@ class RoomFrame(ctk.CTkFrame):
         self.is_admin = role == "admin"
 
         if self.is_admin:
-            self.create_form.pack(fill="x", padx=10, pady=5)
+            self.tab_container.pack(fill="x", padx=10, pady=(5, 0), before=self.content)
         else:
-            self.create_form.pack_forget()
+            self.tab_container.pack_forget()
 
         self.show_rooms(get_rooms())
 
@@ -176,7 +185,6 @@ class RoomFrame(ctk.CTkFrame):
                 on_delete=self.on_delete,
                 on_update=self.on_update,
             ).pack(fill="x")
-        pass
 
 
 class RoomItem(ctk.CTkFrame):
@@ -200,36 +208,51 @@ class RoomItem(ctk.CTkFrame):
         self.view_frame = ctk.CTkFrame(self)
         self.view_frame.pack(fill="x")
 
-        ctk.CTkLabel(self.view_frame, text=str(room.id), width=60).pack(side="left")
-        ctk.CTkLabel(self.view_frame, text=room.type, width=100).pack(side="left")
-        ctk.CTkLabel(self.view_frame, text=str(room.floor), width=60).pack(side="left")
-        ctk.CTkLabel(self.view_frame, text=room.status, width=100).pack(side="left")
+        ctk.CTkLabel(self.view_frame, text=str(room.id), width=60).grid(
+            row=0, column=0, padx=2
+        )
+        ctk.CTkLabel(self.view_frame, text=room.type, width=100).grid(
+            row=0, column=1, padx=2
+        )
+        ctk.CTkLabel(self.view_frame, text=str(room.floor), width=60).grid(
+            row=0, column=2, padx=2
+        )
+        ctk.CTkLabel(self.view_frame, text=room.status, width=100).grid(
+            row=0, column=3, padx=2
+        )
 
         if is_admin:
             ctk.CTkButton(
-                self.view_frame, text="Edit", width=60, command=self._enter_edit
-            ).pack(side="left")
+                self.view_frame, text="Edit", width=80, command=self._enter_edit
+            ).grid(row=0, column=4, padx=2)
             ctk.CTkButton(
-                self.view_frame, text="Remove", width=60, command=self.on_delete
-            ).pack(side="left")
+                self.view_frame, text="Remove", width=80, command=self.on_delete
+            ).grid(row=0, column=5, padx=2)
 
         # Edit frame
         self.edit_frame = ctk.CTkFrame(self)
 
         self.edit_id_label = ctk.CTkLabel(self.edit_frame, text=str(room.id), width=60)
-        self.edit_id_label.pack(side="left")
+        self.edit_id_label.grid(row=0, column=0, padx=2)
+
         self.type_option = ctk.CTkOptionMenu(
             self.edit_frame, values=["small", "medium", "large"], width=100
         )
-        self.type_option.pack(side="left")
+        self.type_option.grid(row=0, column=1, padx=2)
+
         self.floor_entry = ctk.CTkEntry(self.edit_frame, width=60)
-        self.floor_entry.pack(side="left")
+        self.floor_entry.grid(row=0, column=2, padx=2)
+
+        self.edit_frame.grid_columnconfigure(
+            3, minsize=100
+        )  # status spacer (not editable)
+
         ctk.CTkButton(
-            self.edit_frame, text="Confirm", width=60, command=self.on_update
-        ).pack(side="left")
+            self.edit_frame, text="Confirm", width=80, command=self.on_update
+        ).grid(row=0, column=4, padx=2)
         ctk.CTkButton(
-            self.edit_frame, text="Cancel", width=60, command=self._exit_edit
-        ).pack(side="left")
+            self.edit_frame, text="Cancel", width=80, command=self._exit_edit
+        ).grid(row=0, column=5, padx=2)
 
     def _refresh(self):
         if self.edit_mode:
@@ -262,7 +285,6 @@ class RoomItem(ctk.CTkFrame):
                 )
                 return
             self.handle_update(self.room.id, _type, _floor)
-        pass
 
     def on_delete(self):
         if self.handle_delete:
