@@ -19,7 +19,7 @@ class App(ctk.CTk):
 
         # Window setting
         self.title("Dormitory Management System")
-        self.geometry("800x450")
+        self.geometry("1280x720")
 
         # Shared components
         self.side_navigation = SideNavigation(self)
